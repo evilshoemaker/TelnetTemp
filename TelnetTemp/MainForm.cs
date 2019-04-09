@@ -5,7 +5,10 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using System.Timers;
+using System.Threading.Tasks;
 
 namespace TelnetTemp
 {
@@ -13,9 +16,14 @@ namespace TelnetTemp
     {
         private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
+        private System.Timers.Timer timer = new System.Timers.Timer();
+        private TelnetConnection telnetConnection = new TelnetConnection();
+
         public MainForm()
         {
             InitializeComponent();
+
+            timer.Elapsed += Timer_Elapsed;
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -37,11 +45,13 @@ namespace TelnetTemp
             logger.Info("Start new session");
 
             LoadSettings();
+            ApplySettings();
         }
 
         private void saveButton_Click(object sender, EventArgs e)
         {
             SaveSettings();
+            ApplySettings();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -89,6 +99,44 @@ namespace TelnetTemp
         {
             notifyIcon.Visible = Properties.Settings.Default.IsHideToTray;
             Functions.SetAutorunValue(Properties.Settings.Default.IsAutorun);
+
+            timer.Interval = Properties.Settings.Default.Interval * 1000;
+            timer.Stop();
+
+            AsyncGetTemp();
+        }
+
+        private void AsyncGetTemp()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                GetTemp();
+                timer.Start();
+            });
+        }
+
+        private void GetTemp()
+        {
+            //logger.Info(Thread.CurrentThread.ManagedThreadId);
+            try
+            {
+                if (String.IsNullOrEmpty(Properties.Settings.Default.TelnetAddress))
+                    return;
+
+                telnetConnection.Connect(Properties.Settings.Default.TelnetAddress, Properties.Settings.Default.TelnetPort);
+                Thread.Sleep(100);
+                String result = telnetConnection.Read();
+                logger.Info("TELNET: " + result);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+            }
+        }
+
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            GetTemp();
         }
     }
 }
