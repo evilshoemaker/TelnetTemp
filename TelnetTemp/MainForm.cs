@@ -119,7 +119,6 @@ namespace TelnetTemp
 
         private void GetTemp()
         {
-            //logger.Info(Thread.CurrentThread.ManagedThreadId);
             try
             {
                 if (String.IsNullOrEmpty(Properties.Settings.Default.TelnetAddress))
@@ -130,9 +129,19 @@ namespace TelnetTemp
                 Thread.Sleep(100);
 
                 String result = telnetConnection.Read();
-                logger.Info("TELNET: " + result);
-
                 telnetConnection.Close();
+
+                TeMonitorSocketInfo info =TeMonitorSocketInfo.FromTelnetString(result);
+                if (info == null)
+                    return;
+                //logger.Info("TELNET: " + result);
+
+                logger.Info("Temperature: " + info.Temperature);
+
+                if (String.IsNullOrEmpty(Properties.Settings.Default.HostAddress))
+                    return;
+
+                Functions.PostRequest(Properties.Settings.Default.HostAddress, String.Format("weather={0} C", info.Temperature));
             }
             catch (Exception e)
             {

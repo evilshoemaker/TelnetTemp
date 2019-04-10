@@ -111,7 +111,7 @@ namespace TelnetTemp
             }
             catch { }
             
-            logger.Info("Connection aborted");
+            //logger.Info("Connection aborted");
         }
 
         public bool IsConnected
