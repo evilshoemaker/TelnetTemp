@@ -102,7 +102,7 @@ namespace TelnetTemp
             notifyIcon.Visible = Properties.Settings.Default.IsHideToTray;
             Functions.SetAutorunValue(Properties.Settings.Default.IsAutorun);
 
-            timer.Interval = Properties.Settings.Default.Interval * 1000;
+            timer.Interval = Properties.Settings.Default.Interval * 60 * 1000;
             timer.Stop();
 
             AsyncGetTemp();
