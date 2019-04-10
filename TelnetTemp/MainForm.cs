@@ -93,6 +93,8 @@ namespace TelnetTemp
             Properties.Settings.Default.TelnetPort = (int)portNumeric.Value;
             Properties.Settings.Default.HostAddress = hostTextBox.Text;
             Properties.Settings.Default.Interval = (int)intervalNumeric.Value;
+
+            Properties.Settings.Default.Save();
         }
 
         private void ApplySettings()
@@ -124,9 +126,13 @@ namespace TelnetTemp
                     return;
 
                 telnetConnection.Connect(Properties.Settings.Default.TelnetAddress, Properties.Settings.Default.TelnetPort);
+
                 Thread.Sleep(100);
+
                 String result = telnetConnection.Read();
                 logger.Info("TELNET: " + result);
+
+                telnetConnection.Close();
             }
             catch (Exception e)
             {

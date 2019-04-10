@@ -43,7 +43,7 @@ namespace TelnetTemp
 
         public static string PostMethod(string data)
         {
-            //создаем ссылку на которую будем слать наш запрос
+            /*//создаем ссылку на которую будем слать наш запрос
             //string postUrl = "http://arsenal.army/index.php?option=com_jshopping&controller=modem&task=smsGet";
 
             byte[] sentData = Encoding.UTF8.GetBytes("json=" + System.Web.HttpUtility.UrlEncode(data, Encoding.UTF8));

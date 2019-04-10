@@ -28,14 +28,17 @@ namespace TelnetTemp
 
         public TelnetConnection()
         {
-            tcpSocket = new TcpClient();
+            //tcpSocket = new TcpClient();
         }
 
         public void Connect(string Hostname, int Port)
         {
             try
             {
-                tcpSocket.Connect(Hostname, Port);
+                if (tcpSocket != null)
+                    tcpSocket = null;
+
+                tcpSocket = new TcpClient(Hostname, Port);
             }
             catch (Exception e)
             {
@@ -83,6 +86,9 @@ namespace TelnetTemp
 
         public string Read()
         {
+            if (tcpSocket == null)
+                return null;
+
             if (!tcpSocket.Connected)
                 return null;
 
@@ -101,6 +107,7 @@ namespace TelnetTemp
             try
             {
                 tcpSocket.Close();
+                tcpSocket = null;
             }
             catch { }
             
